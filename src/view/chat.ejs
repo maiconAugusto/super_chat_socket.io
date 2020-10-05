@@ -1,0 +1,171 @@
+<html>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+  <script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.1/socket.io.js" integrity="sha512-AcZyhRP/tbAEsXCCGlziPun5iFvcSUpEz2jKkx0blkYKbxU81F+iq8FURwPn1sYFeksJ+sDDrI5XujsqSobWdQ==" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js" integrity="sha512-quHCp3WbBNkwLfYUMd+KwBAgpVukJu5MncuQaWXgCrfgcxCJAq/fo+oqrRKOj+UKEmyMCG3tb8RB63W+EmrOBg==" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jshashes/1.0.8/hashes.min.js" integrity="sha512-1HyPmPHvi5wFUctYkBhwOYgXmMdbPrDaXKBrbGRI3o1CQkTKazG/RKqR8QwVIjTDOQ3uAOPOFkEbzi99Td6yiQ==" crossorigin="anonymous"></script>
+  <style> 
+    div.ex4 {
+      background-color: lightblue;
+      height: auto;
+      width: 200px;  
+      overflow-y: visible;
+    }
+    </style>
+  <link rel="stylesheet" href=".">
+<body>
+  
+<div id="mydiv"></div>
+<script type="text/babel">
+    const { useState, useEffect } = React
+
+    const api = axios.create({baseURL: 'http://localhost:8000/'})
+    const MD5 = new Hashes.MD5;
+
+    function Chat() {
+    
+    const [message, setMessage] = useState('');
+    const [messages, setMessages] = useState([]);
+    const [validation, setValidation] = useState(true);
+    const [name, setName] = useState('');
+    const [users, setUser] = useState([]);
+    const socket = io('http://localhost:8000/');
+
+    useEffect(()=> {
+        socket.on('previusMessage', (data) => {
+            setMessages(data)
+        })
+        socket.on('users', (data) => {
+            setUser(data)
+        })
+    }, [])
+ 
+    useEffect(() =>{
+        socket.on('responseMessage', (data) => {
+            setMessages(data)
+        });
+        socket.on('userLogged', (data) => {
+            setUser(data)
+        })
+    })
+
+    function sendMessage(event) {
+        event.preventDefault()
+        if (message === '') {
+            return
+        }
+        let data = {
+            name: name,
+            message: message
+        }
+        socket.emit('messages', data)
+        setMessage('')
+    }
+
+    function validations(event) {
+        event.preventDefault()
+        if (name === '') {
+            return alert('Informe seu nome')
+        }
+        let data = {
+            name: name
+        }
+        socket.emit('newUsers', data);
+        setValidation(false);
+    }
+
+    return (
+        <div style={{display: 'flex', flexDirection: 'row',height: '100%',width: '100%',backgroundColor: '#5C5C5C'}}>
+            {validation ? (
+                <div style={{display: 'flex', width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center'}}>
+                    <div style={{display: 'flex', width: '25%', justifyContent: 'center', flexDirection: 'column'}}>
+                        <form className="form-signin">
+                            <input type="email" id="inputEmail" onChange={(event) => setName(event.target.value)} className="form-control" placeholder="Informe seu nome" required="" autofocus=""/>
+                            <button className="btn btn-warning btn-block mt-2" onClick={(event) => validations(event)}>Entrar na sala</button>
+                        </form>
+                    </div>
+                </div>
+            ) : (
+                <React.Fragment>
+                    <div style={{display: 'flex', height: '100%',width: '70%', flexDirection: 'column'}}>
+                        <div
+                        style={{
+                            display: 'flex', 
+                            flexDirection: 'column', 
+                            backgroundColor: 'white', 
+                            height: '60%', 
+                            minWidth: '100%',
+                            margin: 20,
+                            borderRadius: 4,
+                            overflow: 'scroll'
+                            }}>
+                            <div data-spy="scroll" data-target="#navbar-example2" data-offset="0">
+                                {messages.map(element => {
+                                    return (
+                                        element.name === name ? (
+                                        <div style={{margin: 10, display: 'flex', flexDirection: 'column', alignItems: 'flex-end'}}>
+                                            <small style={{fontSize: 14}}>{element.name}:</small>
+                                            <div style={{marginTop: 10, display: 'flex', flexDirection: 'row', flexWrap: 'wrap', height: 'auto'}}>
+                                                <p style={{fontSize: 14, backgroundColor: '#CBF7FF', borderRadius: 8, padding: 5}}>{element.message}</p>
+                                            </div>    
+                                        </div>
+                                    ) : (
+                                        <div style={{margin: 10, display: 'flex', flexDirection: 'column'}}>
+                                            <small style={{fontSize: 14}}>{element.name}:</small>
+                                            <div style={{marginTop: 10, display: 'flex', flexDirection: 'row', flexWrap: 'wrap', height: 'auto'}}>
+                                                <p style={{fontSize: 14, backgroundColor: '#F2F2F2', borderRadius: 8, padding: 5}}>{element.message}</p>
+                                            </div>    
+                                        </div>
+                                    )
+                                    )
+                                })}
+                            </div>
+                        </div >
+                        <form>
+                            <input type="text" value={message} onChange={(event) => setMessage(event.target.value)} class="ml-3 form-control" placeholder="Mensagem"/>
+                            <button type="button" style={{fontSize: 14}} type="submit" onClick={(event) => sendMessage(event)}  class="ml-3 mt-2 btn btn-primary btn-lg btn-block">Enviar menssagem</button>    
+                        </form>
+                    </div>
+                    <div style={{display: 'flex', height: '100%',width: '30%', marginLeft: 10}}>
+                        <div 
+                        style={{
+                            display: 'flex', 
+                            flexDirection: 'column', 
+                            backgroundColor: 'white', 
+                            height: '78%', 
+                            width: '100%',
+                            margin: 20,
+                            borderRadius: 4
+                            }}>
+                        <div data-spy="scroll" data-target="#navbar-example2" data-offset="0">
+                            {users.map(element => {
+                                    return (
+                                        <div style={{margin: 10, display: 'flex', flexDirection: 'column'}}>
+                                            <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                                                <svg width="1em" color="green" height="0.5em" viewBox="0 0 16 16" className="bi bi-circle-fill mr-2" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                    <circle cx="8" cy="8" r="8"/>
+                                                </svg>
+                                                <small style={{fontSize: 14}}>{element.name}</small>  
+                                            </div>
+                                        </div>
+                                    )
+                                })}
+                        </div>
+                        </div>
+                    </div>
+                </React.Fragment>
+            )}
+        </div>
+    )
+}
+
+ReactDOM.render(<Chat />, document.getElementById('mydiv'))
+</script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+</body>
+</html>
