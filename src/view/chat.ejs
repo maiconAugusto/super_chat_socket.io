@@ -89,19 +89,23 @@
         firebase.auth().signInWithPopup(provider).then((res) => {
             const user = res.additionalUserInfo.profile;
             socket.emit('newUsers', user);
-            setInfo(user)
+            setInfo(user);
             setValidation(false);
         })
     }
     
-    function validationsFacebook(event) {
+    function validationsGitHub(event) {
         event.preventDefault()
-        let provider = new firebase.auth.FacebookAuthProvider();
+        let provider = new firebase.auth.GithubAuthProvider();
         firebase.auth().signInWithPopup(provider).then((res) => {
-            const user = res.additionalUserInfo.profile;
-            socket.emit('newUsers', user);
+            const user = res
+            let data = {
+                name: user.user.displayName,
+                picture: user.user.photoURL
+            }
+            socket.emit('newUsers', data);
+            setInfo(data);
             setValidation(false);
-            console.log(user)
         })
     }
 
@@ -116,7 +120,7 @@
                                 <i class="far fa-envelope mr-3"></i>
                                 <small>Login com o gmail</small>
                             </button>
-                            <button style={{fontSize: 14, display: 'flex', flexDirection: 'row', justifyContent: 'center'}} className="btn  btn-dark btn-block mt-3" onClick={(event) => validationsFacebook(event)}>
+                            <button style={{fontSize: 14, display: 'flex', flexDirection: 'row', justifyContent: 'center'}} className="btn  btn-dark btn-block mt-3" onClick={(event) => validationsGitHub(event)}>
                                 <i className="fab fa-github pr-1 mr-3"></i>
                                 <small>Login com Github</small>
                             </button>
