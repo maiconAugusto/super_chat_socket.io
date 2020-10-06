@@ -20,6 +20,7 @@ app.post('/create-room/:id', (req ,res) => {
 })
 
 io.on('connection',(socket) => {
+    console.log(socket.id)
     socket.emit('previusMessage', messages)
     socket.emit('userLogged', users)
         socket.on('messages', (data) => {
