@@ -9,6 +9,7 @@ Aplicação de troca de mensagem em tempo real, ao acessar a aplicação é nece
   - Express.
   - NodeJS.
   - Bootstrap.
+  - Firebase.
   - Socket IO.
   - EJS.
 
