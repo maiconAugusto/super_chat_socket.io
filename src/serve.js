@@ -30,6 +30,18 @@ io.on('connection',(socket) => {
             users.push(data);
                 socket.broadcast.emit('users', users);
         })
+        socket.on('exit', (data) => {
+            if (data !== null) {
+                const usersFiltered = []
+                users.map(element => {
+                    if (element.id !== data.id) {
+                        usersFiltered.push(element)
+                    }
+                })
+                usersFiltered.length === 0 ? null : socket.broadcast.emit('users', usersFiltered);
+                usersFiltered.length === 0 ? null : users = usersFiltered
+            }
+        })
 })
 
 server.listen(8000);

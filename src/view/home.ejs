@@ -27,8 +27,9 @@
     const MD5 = new Hashes.MD5;
 
     function Home() {
-
+        
     const [classRoom, setClassRoom] = useState('');
+
     useEffect(() => {
             const socket = io('http://localhost:8000/');
     }, [])
@@ -46,9 +47,9 @@
 
     return (
         <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' ,height: '100%',backgroundColor: '#5C5C5C', textAlign: 'center'}}>
-            <div style={{width: '25%'}}>
-                <small style={{textAlign: 'center', fontSize: 18, marginBotton: 10}} className="font-weight-normal text-white">SUPER CHAT</small>
-                <form className="form-signin">
+            <div style={{width: '40%'}}>
+                <small style={{textAlign: 'center', fontSize: 18}} className="font-weight-normal text-white">SUPER CHAT</small>
+                <form  className="form-signin p-5">
                     <label for="inputEmail" className="sr-only">Email address</label>
                     <input style={{fontSize: 14, height: 44}} type="email" onChange={(event) => setClassRoom(event.target.value)} className="form-control mt-4" placeholder="Informe o nome da sala" required="" autofocus=""/>
                     <button style={{fontSize: 14, display: 'flex', flexDirection: 'row', justifyContent: 'center'}} className="btn btn-warning btn-block mt-2" onClick={(event) => createRoom(event)}>
