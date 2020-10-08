@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "dev": "nodemon src/serve.js"
+    "dev": "nodemon src/serve.js",
+    "start": "node src/serve.js"
   },
   "devDependencies": {
     "add": "^2.0.6",
